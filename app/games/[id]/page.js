@@ -47,24 +47,24 @@ export default function GamePage(props) {
 					setCurrentUser(userData)
 				} else {
 					setIsAuthorized(false)
-					setCurrentUser(null)
 					removeJWT()
 				}
 			})
 		}
-	}, [isAuthorized])
+	}, [])
 
 	useEffect(() => {
-		if (game && currentUser) {
-			setIsVoted(checkIfUserVoted(game, currentUser))
+		if (currentUser && game) {
+			setIsVoted(checkIfUserVoted(game, currentUser.id))
 		} else {
 			setIsVoted(false)
 		}
-	}, [])
+	}, [currentUser])
 
 	const handleVote = async () => {
 		const jwt = getJWT()
 		let usersIdArray = game.users.length ? game.users.map(user => user.id) : []
+		usersIdArray.push(currentUser.id)
 		const response = await vote(
 			`${endpoints.games}/${game.id}`,
 			jwt,
@@ -72,12 +72,10 @@ export default function GamePage(props) {
 		)
 		if (isResponseOk(response)) {
 			setIsVoted(true)
-			setGame(() => {
-				return { ...game, users: [...game.users, currentUser] }
-			})
+			setGame({ ...game, users: [...game.users, currentUser] })
+			console.log(currentUser)
+			console.log(game)
 		}
-		console.log(usersIdArray)
-		console.log(game)
 	}
 
 	return (
@@ -108,9 +106,9 @@ export default function GamePage(props) {
 								</span>
 							</p>
 							<button
+								disabled={!isAuthorized || isVoted}
 								className={`button ${Styles['about__vote-button']}`}
 								onClick={handleVote}
-								disabled={!isAuthorized || isVoted}
 							>
 								{isVoted ? 'Голос учтён' : 'Голосовать'}
 							</button>

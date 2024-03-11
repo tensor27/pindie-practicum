@@ -87,22 +87,21 @@ export const checkIfUserVoted = (game, userId) => {
 }
 
 export const vote = async (url, jwt, usersArray) => {
-	const headers = {
-		'Content-Type': 'application/json',
-		Authorization: `Bearer ${jwt}`,
-	}
 	try {
 		const response = await fetch(url, {
 			method: 'PUT',
-			headers,
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${jwt}`,
+			},
 			body: JSON.stringify({ users_permissions_users: usersArray }),
 		})
-		const result = await response.json()
-		if (!response.ok) {
+		if (response.status !== 200) {
 			throw new Error('Ошибка голосования')
 		}
+		const result = await response.json()
 		return result
 	} catch (error) {
-		return error.message
+		return error
 	}
 }
