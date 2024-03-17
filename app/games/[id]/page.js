@@ -1,25 +1,22 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
 	checkIfUserVoted,
-	getJWT,
-	getMe,
 	getNormalizedGameDataById,
 	isResponseOk,
-	removeJWT,
 	vote,
 } from '../../api/api-utils'
 import { endpoints } from '../../api/config'
 import { Preloader } from '../../components/Preloader/Preloader.jsx'
+import { AuthContext } from '../../context/app-context.js'
 
 import Styles from './Game.module.css'
 
 export default function GamePage(props) {
+	const authContext = useContext(AuthContext)
 	const [game, setGame] = useState(null)
 	const [preloaderVisible, setPreloaderVisible] = useState(true)
-	const [isAuthorized, setIsAuthorized] = useState(false)
-	const [currentUser, setCurrentUser] = useState(null)
 	const [isVoted, setIsVoted] = useState(false)
 
 	useEffect(() => {
@@ -38,43 +35,50 @@ export default function GamePage(props) {
 	}, [])
 
 	useEffect(() => {
-		const jwt = getJWT()
-		if (jwt) {
-			getMe(endpoints.me, jwt).then(userData => {
-				if (isResponseOk(userData)) {
-					setIsAuthorized(true)
-					setCurrentUser(userData)
-				} else {
-					setIsAuthorized(false)
-					removeJWT()
-				}
-			})
-		}
-	}, [])
-
-	useEffect(() => {
-		if (currentUser && game) {
-			setIsVoted(checkIfUserVoted(game, currentUser.id))
+		if (authContext.user && game) {
+			setIsVoted(checkIfUserVoted(game, authContext.user.id))
 		} else {
 			setIsVoted(false)
 		}
-	}, [currentUser])
+	}, [authContext.user])
 
 	const handleVote = async () => {
-		const jwt = getJWT()
+		const jwt = authContext.token
 		const users = game.users ? game?.users.map(user => user.id) : []
 		if (jwt) {
-			users.push(currentUser)
+			users.push(authContext.user)
 			const response = await vote(`${endpoints.games}/${game.id}`, jwt, users)
 			if (isResponseOk(response)) {
 				setIsVoted(true)
 				setGame(() => {
-					return { ...game, users: [...game.users, currentUser] }
+					return { ...game, users: [...game.users, authContext.user] }
 				})
 				console.log(game.users)
 			}
 		}
 	}
+	
+	// const handleVote = async () => {
+	// 	const jwt = authContext.token
+	// 	let usersIdArray = game.users.length ? game.users.map(user => user.id) : []
+	// 	usersIdArray.push(authContext.user.id)
+	// 	const response = await vote(
+	// 		`${endpoints.games}/${game.id}`,
+	// 		jwt,
+	// 		usersIdArray
+	// 	)
+	// 	console.log(usersIdArray);
+	// 	if (isResponseOk(response)) {
+	// 		setGame(() => {
+	// 			return {
+	// 				...game,
+
+	// 				users: [...game.users, authContext.user],
+	// 			}
+	// 		})
+	// 		setIsVoted(true)
+	// 	}
+	// }
 
 	return (
 		<main className='main'>
@@ -104,7 +108,7 @@ export default function GamePage(props) {
 								</span>
 							</p>
 							<button
-								disabled={!isAuthorized || isVoted}
+								disabled={!authContext.isAuth || isVoted}
 								className={`button ${Styles['about__vote-button']}`}
 								onClick={handleVote}
 							>
