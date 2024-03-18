@@ -1,6 +1,6 @@
 'use client'
 
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
 	checkIfUserVoted,
 	getNormalizedGameDataById,
@@ -9,12 +9,12 @@ import {
 } from '../../api/api-utils'
 import { endpoints } from '../../api/config'
 import { Preloader } from '../../components/Preloader/Preloader.jsx'
-import { AuthContext } from '../../context/app-context.js'
 
+import { useStore } from '../../store/app-store'
 import Styles from './Game.module.css'
 
 export default function GamePage(props) {
-	const authContext = useContext(AuthContext)
+	const authContext = useStore()
 	const [game, setGame] = useState(null)
 	const [preloaderVisible, setPreloaderVisible] = useState(true)
 	const [isVoted, setIsVoted] = useState(false)
@@ -42,43 +42,42 @@ export default function GamePage(props) {
 		}
 	}, [authContext.user])
 
-	const handleVote = async () => {
-		const jwt = authContext.token
-		const users = game.users ? game?.users.map(user => user.id) : []
-		if (jwt) {
-			users.push(authContext.user)
-			const response = await vote(`${endpoints.games}/${game.id}`, jwt, users)
-			if (isResponseOk(response)) {
-				setIsVoted(true)
-				setGame(() => {
-					return { ...game, users: [...game.users, authContext.user] }
-				})
-				console.log(game.users)
-			}
-		}
-	}
-	
 	// const handleVote = async () => {
 	// 	const jwt = authContext.token
-	// 	let usersIdArray = game.users.length ? game.users.map(user => user.id) : []
-	// 	usersIdArray.push(authContext.user.id)
-	// 	const response = await vote(
-	// 		`${endpoints.games}/${game.id}`,
-	// 		jwt,
-	// 		usersIdArray
-	// 	)
-	// 	console.log(usersIdArray);
-	// 	if (isResponseOk(response)) {
-	// 		setGame(() => {
-	// 			return {
-	// 				...game,
-
-	// 				users: [...game.users, authContext.user],
-	// 			}
-	// 		})
-	// 		setIsVoted(true)
+	// 	const users = game.users ? game?.users.map(user => user.id) : []
+	// 	if (jwt) {
+	// 		users.push(authContext.user)
+	// 		const response = await vote(`${endpoints.games}/${game.id}`, jwt, users)
+	// 		if (isResponseOk(response)) {
+	// 			setIsVoted(true)
+	// 			setGame(() => {
+	// 				return { ...game, users: [...game.users, authContext.user] }
+	// 			})
+	// 			console.log(game.users)
+	// 		}
 	// 	}
 	// }
+
+	const handleVote = async () => {
+		const jwt = authContext.token
+		let usersIdArray = game.users.length ? game.users.map(user => user.id) : []
+		usersIdArray.push(authContext.user.id)
+		const response = await vote(
+			`${endpoints.games}/${game.id}`,
+			jwt,
+			usersIdArray
+		)
+		if (isResponseOk(response)) {
+			setGame(() => {
+				return {
+					...game,
+
+					users: [...game.users, authContext.user],
+				}
+			})
+			setIsVoted(true)
+		}
+	}
 
 	return (
 		<main className='main'>

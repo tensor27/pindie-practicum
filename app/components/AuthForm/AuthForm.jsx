@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
-import { authorize, getMe, isResponseOk, setJWT } from '../../api/api-utils'
+import { authorize, isResponseOk } from '../../api/api-utils'
 import { endpoints } from '../../api/config'
+import { useStore } from '../../store/app-store'
 import Styles from './AuthForm.module.css'
-import { useContext } from 'react'
-import { AuthContext } from '../../context/app-context'
 
 export const AuthForm = props => {
-	const authContext = useContext(AuthContext)
-	
+	const authContext = useStore()
+
 	const [authData, setAuthData] = useState({ identifier: '', password: '' })
 	const [message, setMessage] = useState({ status: null, text: null })
 	const handleInput = e => {
@@ -18,7 +17,7 @@ export const AuthForm = props => {
 		const userData = await authorize(endpoints.auth, authData)
 		if (isResponseOk(userData)) {
 			authContext.login(userData.user, userData.jwt)
-			
+
 			setMessage({ status: 'success', text: 'Вы авторизовались' })
 		} else {
 			setMessage({ status: 'error', text: 'Неверные почта или пароль' })
@@ -29,12 +28,11 @@ export const AuthForm = props => {
 		let timer
 		if (authContext.user) {
 			timer = setTimeout(() => {
+				setMessage({ status: null, text: null })
 				props.close()
 			}, 1000)
 		}
-		return () => {
-			clearTimeout(timer)
-		}
+		return () => clearTimeout(timer)
 	}, [authContext.user])
 
 	return (

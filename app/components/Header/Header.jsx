@@ -1,8 +1,8 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useContext, useState } from 'react'
-import { AuthContext } from '../../context/app-context'
+import { useState } from 'react'
+import { useStore } from '../../store/app-store'
 import { AuthForm } from '../AuthForm/AuthForm'
 import { Overlay } from '../Overlay/Overlay'
 import { Popup } from '../Popup/Popup'
@@ -10,7 +10,7 @@ import Styles from './Header.module.css'
 
 export const Header = () => {
 	const [popUpIsOpened, setPopUpIsOpened] = useState(false)
-	const authContext = useContext(AuthContext)
+	const authContext = useStore()
 	const handleLogOut = () => {
 		authContext.logout()
 	}
