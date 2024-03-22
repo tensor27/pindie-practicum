@@ -1,7 +1,7 @@
 'use client'
 import { useGetDataByCategory } from '../../../api/api-hooks'
 import { endpoints } from '../../../api/config'
-import { CardList } from '../../../components/CardList/CardList'
+import { CardListSection } from '../../../components/CardListSection/CardListSection.jsx'
 import { Preloader } from '../../../components/Preloader/Preloader.jsx'
 
 export default function FilteredGames(props) {
@@ -14,7 +14,12 @@ export default function FilteredGames(props) {
 					<h1 style={{ textAlign: 'center' }}>
 						{props.params.category.toUpperCase()}
 					</h1>
-					<CardList id={games.id} title={games.title} data={games} />
+					<CardListSection
+						id={games.id}
+						title={games.title}
+						data={games}
+						type='slider'
+					/>
 				</div>
 			) : (
 				<Preloader />

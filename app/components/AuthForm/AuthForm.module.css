@@ -92,3 +92,46 @@
 	opacity: 0.5;
 	pointer-events: none;
 }
+
+/* .popup {
+	
+	width: 600px;
+	background-color: #fff;
+	padding: 32px 78px;
+	border-radius: 22px;
+	z-index: 3;
+	position: absolute;
+	top: 34%;
+	left: 34%;
+	display: flex;
+}
+
+.popup_is-opened {
+	display: block;
+}
+
+.close {
+	background-color: transparent;
+	border: none;
+	position: absolute;
+	top: 12px;
+	right: 12px;
+}
+
+.close-icon {
+	width: 16px;
+	height: 25px;
+	transition: opacity 0.3s ease-in-out;
+}
+
+.close-icon:hover {
+	cursor: pointer;
+	opacity: 0.6;
+}
+
+@media (width <= 650px) {
+	.popup {
+		width: 90%;
+		padding: 32px 24px;
+	}
+} */

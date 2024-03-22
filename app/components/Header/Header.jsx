@@ -1,4 +1,5 @@
 'use client'
+import { AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -128,10 +129,16 @@ export const Header = () => {
 					)}
 				</div>
 			</nav>
-			<Overlay popUpIsOpened={popUpIsOpened} closePopup={closePopup} />
-			<Popup popUpIsOpened={popUpIsOpened} closePopup={closePopup}>
-				<AuthForm close={closePopup} />
-			</Popup>
+			<AnimatePresence initial={false} onExitComplete={() => null}>
+				{popUpIsOpened && (
+					<>
+						<Overlay popUpIsOpened={popUpIsOpened} closePopup={closePopup} />
+						<Popup closePopup={closePopup}>
+							<AuthForm close={closePopup} />
+						</Popup>
+					</>
+				)}
+			</AnimatePresence>
 		</header>
 	)
 }

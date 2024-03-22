@@ -20,7 +20,7 @@ export default function GamePage(props) {
 	const [isVoted, setIsVoted] = useState(false)
 
 	useEffect(() => {
-		;(async function fetchData() {
+		async function fetchData() {
 			try {
 				const game = await getNormalizedGameDataById(
 					endpoints.games,
@@ -31,7 +31,8 @@ export default function GamePage(props) {
 				setPreloaderVisible(false)
 				setGame(null)
 			}
-		})()
+		}
+		fetchData()
 	}, [])
 
 	useEffect(() => {
@@ -40,7 +41,7 @@ export default function GamePage(props) {
 		} else {
 			setIsVoted(false)
 		}
-	}, [authContext.user])
+	}, [authContext.user, game])
 
 	// const handleVote = async () => {
 	// 	const jwt = authContext.token
